@@ -22,13 +22,13 @@ exports.login = async (req, res) => {
 
 exports.googleAuth = async (req, res) => {
   try {
-    const { access_token } = req.body; // The 'ya29...' token from frontend
+    const { token } = req.body; // The 'ya29...' token from frontend
 
-    if (!access_token) {
+    if (!token) {
       return res.status(400).json({ message: 'Token is required' });
     }
 
-    const result = await authService.googleAuth(access_token);
+    const result = await authService.googleAuth(token);
     
     // Returns { token, user: { id, name, email } }
     res.status(200).json(result);

@@ -40,20 +40,20 @@ export const api = {
 
     return { success: true , token , user };
   },
-  auth: {
-    async google(accessToken: string) {
-      const res = await apiClient.post('/auth/google', { access_token: accessToken });
-      const { token, user } = res.data;
-      if (token) {
-        localStorage.setItem('token', token);
-      }
-      return { token, user };
+  // In api.tsx
+auth: {
+  async google(idToken: string) {
+    const res = await apiClient.post('/auth/google', { token: idToken }); 
+    const { token, user } = res.data;
+    if (token) {
+      localStorage.setItem('token', token);
     }
-  } ,
+    return { token, user };
+  }
+},
   // ---------------- WALLET ----------------
 
   async getWallet() {
-    // Snapshot only (authoritative state still comes via socket)
     const res = await apiClient.get('/wallet');
     return res.data;
   },
@@ -61,8 +61,6 @@ export const api = {
   async topUp(amount: number) {
     await apiClient.post('/wallet/topup', { amount });
 
-    // No balance returned intentionally
-    // Wallet update will arrive via WebSocket
     return { status: 'command_accepted' };
   },
 
@@ -76,8 +74,6 @@ export const api = {
   }) {
     const res = await apiClient.post('/orders', order);
 
-    // Backend only ACKs receipt
-    // Order/trade updates come via socket
     return res.data;
   },
 
@@ -85,13 +81,13 @@ export const api = {
   async getOpenOrders() {
     // Fetches the user's currently active (OPEN/PARTIAL) orders
     const res = await apiClient.get('/orders/open');
-    return res.data; // Expected: Array of Order objects
+    return res.data; 
   },
 
   async getRecentTrades() {
     // Fetches the global recent trade history for the feed
     const res = await apiClient.get('/orders/trades');
-    return res.data; // Expected: Array of Trade objects
+    return res.data;
   },
   
 };

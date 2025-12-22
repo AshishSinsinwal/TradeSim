@@ -35,7 +35,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       {/* --- SIDEBAR RAIL --- */}
       <aside 
         className={`bg-black border-r border-zinc-800 transition-all duration-300 ease-in-out flex flex-col z-50
-          ${isExpanded ? 'w-[220px]' : 'w-[68px]'}`}
+          ${isExpanded ? 'w-[200px]' : 'w-[68px]'}`}
       >
         {/* Brand + Toggle Header */}
         <div className={`p-4 h-16 flex items-center border-b border-zinc-900 ${isExpanded ? 'justify-between' : 'justify-center'}`}>

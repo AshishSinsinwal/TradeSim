@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { api } from '../services/api';
 import { useAuth } from '@/services/authContext';
-import { Mail, Lock, User, Chrome } from 'lucide-react';
+import { Mail, Lock, User } from 'lucide-react';
+import { GoogleLogin, CredentialResponse } from '@react-oauth/google';
 
 interface AuthPageProps {
   onLoginSuccess: () => void;
@@ -15,9 +16,22 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLoginSuccess }) => {
 
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
 
-  // 🔥 Temporary placeholder for Google Login
-  const handleGoogleLogin = () => {
-    alert("Google Auth is currently under development. Please use the Email/Password options to Sign In or Sign Up.");
+  const handleGoogleLogin = async (response: CredentialResponse) => {
+    try {
+      if (!response.credential) {
+        throw new Error("No credential received from Google");
+      }
+
+      const { user, token } = await api.auth.google(response.credential);
+
+      login(user, token);
+      
+      onLoginSuccess(); 
+
+    } catch (err: any) {
+      console.error('Google Login Failed:', err);
+      setError(err.response?.data?.message || 'Google Login failed. Please try again.');
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -51,15 +65,18 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLoginSuccess }) => {
         </header>
 
         <div className="space-y-6">
-          {/* Google Auth Button (Placeholder Alert) */}
-          <button 
-            type="button" // Specified as button to prevent form submission
-            onClick={handleGoogleLogin}
-            className="w-full flex items-center justify-center gap-3 bg-zinc-800 hover:bg-zinc-700 text-white font-medium py-3 rounded-xl transition-all border border-zinc-700"
-          >
-            <Chrome size={20} className="text-blue-400" />
-            Continue with Google
-          </button>
+          
+          <div className="flex justify-center w-full">
+            <GoogleLogin
+              onSuccess={handleGoogleLogin} 
+              onError={() => setError("Google Login Failed")}
+              theme="filled_black"
+              shape="pill"
+              size="large"
+              width="350"
+              text={isLogin ? "signin_with" : "signup_with"}
+            />
+          </div>
 
           <div className="relative flex items-center gap-4">
             <div className="flex-1 h-px bg-zinc-800"></div>
@@ -68,7 +85,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLoginSuccess }) => {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {!isLogin && (
+             {!isLogin && (
               <div className="relative">
                 <User className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500" size={18} />
                 <input

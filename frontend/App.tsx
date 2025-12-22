@@ -6,9 +6,10 @@ import WalletPage from './pages/WalletPage';
 import AuthPage from './pages/AuthPage';
 import { WalletProvider } from './services/WalletContext';
 import { AuthProvider } from './services/authContext';
-import { SocketManager } from './services/SocketManager'; // 👈 ✅ NEW IMPORT
+import { SocketManager } from './services/SocketManager';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
-// Check token for initial routing state
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 const isAuthenticated = () => {
   return Boolean(localStorage.getItem('token'));
 };
@@ -27,52 +28,49 @@ const ProtectedRoute = ({
 };
 
 const App: React.FC = () => {
-  // We keep this local state specifically for Routing logic
   const [authenticated, setAuthenticated] = useState(isAuthenticated());
 
   return (
-    <AuthProvider>
-      <WalletProvider>
-        {/* ✅ SOCKET MANAGER
-           Placed inside Providers but outside Router.
-           It automatically connects/disconnects based on AuthContext state.
-        */}
-        <SocketManager /> 
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+        <AuthProvider>
+          <WalletProvider>
+            <SocketManager /> 
 
-        <Router>
-          <Routes>
-            <Route
-              path="/auth"
-              element={
-                authenticated ? (
-                  <Navigate to="/" replace />
-                ) : (
-                  <AuthPage onLoginSuccess={() => setAuthenticated(true)} />
-                )
-              }
-            />
+            <Router>
+              <Routes>
+                <Route
+                  path="/auth"
+                  element={
+                    authenticated ? (
+                      <Navigate to="/" replace />
+                    ) : (
+                      <AuthPage onLoginSuccess={() => setAuthenticated(true)} />
+                    )
+                  }
+                />
 
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute authenticated={authenticated}>
-                  <TradingPage />
-                </ProtectedRoute>
-              }
-            />
+                <Route
+                  path="/"
+                  element={
+                    <ProtectedRoute authenticated={authenticated}>
+                      <TradingPage />
+                    </ProtectedRoute>
+                  }
+                />
 
-            <Route
-              path="/wallet"
-              element={
-                <ProtectedRoute authenticated={authenticated}>
-                  <WalletPage />
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
-        </Router>
-      </WalletProvider>
-    </AuthProvider> 
+                <Route
+                  path="/wallet"
+                  element={
+                    <ProtectedRoute authenticated={authenticated}>
+                      <WalletPage />
+                    </ProtectedRoute>
+                  }
+                />
+              </Routes>
+            </Router>
+          </WalletProvider>
+        </AuthProvider> 
+  </GoogleOAuthProvider>
   );
 };
 
