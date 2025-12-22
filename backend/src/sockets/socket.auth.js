@@ -31,5 +31,5 @@ exports.initSocket = async (server) => {
 
   // 🔥 Redis → Socket bridge
   await initRedisSubscribers(io);
-    await initWalletSubscriber(io);
+  // await initWalletSubscriber(io);
 };

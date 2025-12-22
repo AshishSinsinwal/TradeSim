@@ -1,83 +1,79 @@
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import TradingPage from './pages/TradingPage';
 import WalletPage from './pages/WalletPage';
 import AuthPage from './pages/AuthPage';
-import { socketService } from './services/socket';
-import { WalletProvider } from './services/WalletContext'; // 👈 Import Provider
-import { AuthProvider} from './services/authContext';
-// import { GoogleOAuthProvider } from '@react-oauth/google';
+import { WalletProvider } from './services/WalletContext';
+import { AuthProvider } from './services/authContext';
+import { SocketManager } from './services/SocketManager'; // 👈 ✅ NEW IMPORT
 
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-
+// Check token for initial routing state
 const isAuthenticated = () => {
-  return Boolean(localStorage.getItem('token'));
+  return Boolean(localStorage.getItem('token'));
 };
 
 const ProtectedRoute = ({ 
-  children, 
-  authenticated 
+  children, 
+  authenticated 
 }: { 
-  children: React.ReactNode; 
-  authenticated: boolean 
+  children: React.ReactNode; 
+  authenticated: boolean 
 }) => {
-  if (!authenticated) {
-    return <Navigate to="/auth" replace />;
-  }
-  return <Layout>{children}</Layout>;
+  if (!authenticated) {
+    return <Navigate to="/auth" replace />;
+  }
+  return <Layout>{children}</Layout>;
 };
 
 const App: React.FC = () => {
-  const [authenticated, setAuthenticated] = React.useState(isAuthenticated());
+  // We keep this local state specifically for Routing logic
+  const [authenticated, setAuthenticated] = useState(isAuthenticated());
 
-  useEffect(() => {
-    if (authenticated) {
-      socketService.connect();
-    } else {
-      socketService.disconnect();
-    }
-  }, [authenticated]);
+  return (
+    <AuthProvider>
+      <WalletProvider>
+        {/* ✅ SOCKET MANAGER
+           Placed inside Providers but outside Router.
+           It automatically connects/disconnects based on AuthContext state.
+        */}
+        <SocketManager /> 
 
-  return (
-    // 👈 Wrap with WalletProvider
-    <AuthProvider>
-      <WalletProvider> 
-        <Router>
-          <Routes>
-            <Route
-              path="/auth"
-              element={
-                authenticated ? (
-                  <Navigate to="/" replace />
-                ) : (
-                  <AuthPage onLoginSuccess={() => setAuthenticated(true)} />
-                )
-              }
-            />
+        <Router>
+          <Routes>
+            <Route
+              path="/auth"
+              element={
+                authenticated ? (
+                  <Navigate to="/" replace />
+                ) : (
+                  <AuthPage onLoginSuccess={() => setAuthenticated(true)} />
+                )
+              }
+            />
 
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute authenticated={authenticated}>
-                  <TradingPage />
-                </ProtectedRoute>
-              }
-            />
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute authenticated={authenticated}>
+                  <TradingPage />
+                </ProtectedRoute>
+              }
+            />
 
-            <Route
-              path="/wallet"
-              element={
-                <ProtectedRoute authenticated={authenticated}>
-                  <WalletPage />
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
-        </Router>
-      </WalletProvider>
-    </AuthProvider> 
-  );
+            <Route
+              path="/wallet"
+              element={
+                <ProtectedRoute authenticated={authenticated}>
+                  <WalletPage />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </Router>
+      </WalletProvider>
+    </AuthProvider> 
+  );
 };
 
 export default App;
