@@ -1,0 +1,5 @@
+{
+  "name": "NovaTrade Pro",
+  "description": "A high-performance real-time trading simulation platform with authoritative state management and WebSocket-driven updates.",
+  "requestFramePermissions": []
+}
