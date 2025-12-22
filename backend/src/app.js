@@ -8,8 +8,8 @@ const orderRoutes = require('./modules/trading/order.routes');
 const app = express();
 
 app.use(cors({
-    origin: "https://trade-sim-ten.vercel.app",
-    credentials: true
+    origin : "*",
+    credentials : true
 }));
 
 app.use(express.json());

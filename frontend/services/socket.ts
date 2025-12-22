@@ -3,64 +3,47 @@ import { io, Socket } from 'socket.io-client';
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL;
 
 class SocketService {
-  private socket: Socket | null = null;
+  public socket: Socket;
 
-  connect() {
-    if (this.socket?.connected) return;
-
-    const token = localStorage.getItem('token');
-    if (!token) {
-      console.warn('Socket connection skipped: no token');
-      return;
-    }
-
+  constructor() {
+    // 1. Initialize immediately so listeners can be attached before connection
     this.socket = io(SOCKET_URL, {
       transports: ['websocket'],
-      auth: {
-        token,
-      },
-      autoConnect: false,
+      autoConnect: false, 
       reconnection: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000,
     });
 
-    this.socket.on('connect', () => {
-      console.log('🔌 Connected to Trading WebSocket');
-    });
+    // Debug listeners
+    this.socket.on('connect', () => console.log('✅ Socket Connected:', this.socket.id));
+    this.socket.on('disconnect', () => console.warn('❌ Socket Disconnected'));
+    this.socket.on('connect_error', (err) => console.error('⚠️ Connection Error:', err.message));
+  }
 
-    this.socket.on('disconnect', (reason) => {
-      console.log('🔌 Disconnected:', reason);
-    });
+  connect(token: string) {
+    if (this.socket.connected) return;
 
-    this.socket.on('connect_error', (err) => {
-      console.error('Socket connection error:', err.message);
-    });
-
+    this.socket.auth = { token };
     this.socket.connect();
   }
 
   disconnect() {
-    if (this.socket) {
+    if (this.socket.connected) {
       this.socket.disconnect();
-      this.socket = null;
     }
   }
 
   on<T = any>(event: string, callback: (data: T) => void) {
-    this.socket?.on(event, callback);
+    this.socket.on(event, callback);
   }
 
   off(event: string, callback?: (...args: any[]) => void) {
-    this.socket?.off(event, callback);
+    this.socket.off(event, callback);
   }
-  
+
+  // ✅ ADDED BACK: The missing method
   isConnected() {
-  return this.socket?.connected ?? false;
+    return this.socket.connected;
+  }
 }
-
-}
-
-
 
 export const socketService = new SocketService();
