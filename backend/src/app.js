@@ -4,6 +4,7 @@ const cors = require('cors');
 const authRoutes = require('./modules/auth/auth.routes');
 const walletRoutes = require('./modules/wallet/wallet.routes');
 const orderRoutes = require('./modules/trading/order.routes');
+const mlRoutes = require('./routes/ml.routes');
 
 const app = express();
 
@@ -17,5 +18,6 @@ app.use(express.json());
 app.use('/auth' , authRoutes);
 app.use('/wallet' , walletRoutes);
 app.use('/orders' , orderRoutes);
+app.use('/ml', mlRoutes);
 
 module.exports = app;

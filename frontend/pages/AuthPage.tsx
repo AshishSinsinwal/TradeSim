@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { api } from '../services/api';
 import { useAuth } from '@/services/authContext';
+import { useWallet } from '@/services/WalletContext';
 import { Mail, Lock, User } from 'lucide-react';
 import { GoogleLogin, CredentialResponse } from '@react-oauth/google';
 
@@ -10,6 +11,7 @@ interface AuthPageProps {
 
 const AuthPage: React.FC<AuthPageProps> = ({ onLoginSuccess }) => {
   const { login } = useAuth();
+  const { refreshWallet } = useWallet();
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -25,7 +27,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLoginSuccess }) => {
       const { user, token } = await api.auth.google(response.credential);
 
       login(user, token);
-      
+      await refreshWallet();
       onLoginSuccess(); 
 
     } catch (err: any) {
@@ -42,9 +44,11 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLoginSuccess }) => {
       if (isLogin) {
         const res = await api.login({ email: formData.email, password: formData.password });
         login(res.user, res.token);
+          await refreshWallet();
       } else {
         const res = await api.register(formData);
         login(res.user, res.token);
+          await refreshWallet();
       }
       onLoginSuccess();
     } catch (err: any) {

@@ -5,7 +5,8 @@ import {
   LogOut, 
   TrendingUp, 
   PanelLeftClose, 
-  PanelLeftOpen, 
+  PanelLeftOpen,
+  AlertTriangle,
 } from 'lucide-react';
 import { socketService } from '../services/socket';
 import { useAuth } from '@/services/authContext';
@@ -28,6 +29,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const navItems = [
     { path: '/', label: 'Trading', icon: <TrendingUp size={20} /> },
     { path: '/wallet', label: 'Wallet', icon: <Wallet size={20} /> },
+    { path: '/anomalies', label: 'Anomalies', icon: <AlertTriangle size={20} /> },
   ];
 
   return (

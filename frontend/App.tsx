@@ -3,6 +3,7 @@ import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import Layout from './components/Layout';
 import TradingPage from './pages/TradingPage';
 import WalletPage from './pages/WalletPage';
+import AnomalyDashboard from './pages/AnomalyDashboard';
 import AuthPage from './pages/AuthPage';
 import { WalletProvider } from './services/WalletContext';
 import { AuthProvider } from './services/authContext';
@@ -63,6 +64,15 @@ const App: React.FC = () => {
                   element={
                     <ProtectedRoute authenticated={authenticated}>
                       <WalletPage />
+                    </ProtectedRoute>
+                  }
+                />
+
+                <Route
+                  path="/anomalies"
+                  element={
+                    <ProtectedRoute authenticated={authenticated}>
+                      <AnomalyDashboard />
                     </ProtectedRoute>
                   }
                 />
