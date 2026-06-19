@@ -13,6 +13,7 @@ exports.save = async (order) => {
     remaining: order.remaining.toString(),
     status: order.status,
     timestamp: order.timestamp.toString(),
+    lockedAmount: order.lockedAmount?.toString() || '0', 
   });
 };
 
@@ -26,6 +27,7 @@ exports.get = async (id) => {
     quantity: Number(data.quantity),
     remaining: Number(data.remaining),
     timestamp: Number(data.timestamp),
+    lockedAmount: Number(data.lockedAmount || 0), 
   };
 };
 

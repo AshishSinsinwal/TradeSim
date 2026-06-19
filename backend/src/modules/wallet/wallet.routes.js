@@ -14,6 +14,7 @@ router.get('/', async (req, res) => {
 
 router.post('/topup', async (req, res) => {
   const { amount } = req.body;
+  console.log(`Top-up request received for user ${req.userId} with amount ${amount}`);
   await walletService.topUp(req.userId, amount);
   res.status(204).end();
 });

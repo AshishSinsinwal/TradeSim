@@ -3,12 +3,16 @@ const { OrderStatus } = require('./order.model');
 const orderRepo = require('./order.repository');
 const { redisClient } = require('../../config/redis');
 const publisher = require('./event.publisher');
+const {performance} = require('perf_hooks');
+
 class RedisMatchingEngine {
   constructor(orderBook) {
     this.orderBook = orderBook;
   }
 
   async process(order) {
+    const start = performance.now();
+
     const trades = [];
 
     await orderRepo.save(order); 
@@ -23,6 +27,8 @@ class RedisMatchingEngine {
       await this.orderBook.addOrder(order);
     }
 
+    const end = performance.now();
+    console.log(`[METRICS] Order processed in: ${(end - start).toFixed(3)} ms`);
     return trades;
   }
 

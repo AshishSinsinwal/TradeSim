@@ -6,7 +6,6 @@ import {
   TrendingUp, 
   PanelLeftClose, 
   PanelLeftOpen,
-  AlertTriangle,
 } from 'lucide-react';
 import { socketService } from '../services/socket';
 import { useAuth } from '@/services/authContext';
@@ -29,26 +28,30 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const navItems = [
     { path: '/', label: 'Trading', icon: <TrendingUp size={20} /> },
     { path: '/wallet', label: 'Wallet', icon: <Wallet size={20} /> },
-    { path: '/anomalies', label: 'Anomalies', icon: <AlertTriangle size={20} /> },
   ];
 
   return (
-    <div className="flex h-screen bg-[#050505] text-zinc-200 font-sans">
+    <div className="flex h-screen bg-[#050505] text-zinc-200 font-sans relative overflow-hidden">
+      
+      {/* --- AMBIENT GLOW (THE GLASSMORPHISM LIGHT SOURCE) --- */}
+      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-emerald-500/10 rounded-full blur-[150px] pointer-events-none z-0" />
+      <div className="absolute bottom-[-20%] right-[-10%] w-[40%] h-[40%] bg-blue-500/5 rounded-full blur-[150px] pointer-events-none z-0" />
+
       {/* --- SIDEBAR RAIL --- */}
       <aside 
-        className={`bg-black border-r border-zinc-800 transition-all duration-300 ease-in-out flex flex-col z-50
+        className={`bg-black/40 backdrop-blur-xl border-r border-white/5 transition-all duration-300 ease-in-out flex flex-col z-50
           ${isExpanded ? 'w-[200px]' : 'w-[68px]'}`}
       >
         {/* Brand + Toggle Header */}
-        <div className={`p-4 h-16 flex items-center border-b border-zinc-900 ${isExpanded ? 'justify-between' : 'justify-center'}`}>
+        <div className={`p-4 h-16 flex items-center border-b border-white/5 ${isExpanded ? 'justify-between' : 'justify-center'}`}>
           {isExpanded && (
-            <span className="text-xl font-bold tracking-tight text-white">
+            <span className="text-xl font-bold tracking-tight text-white drop-shadow-md">
               Trade<span className="text-emerald-500">Sim</span>
             </span>
           )}
           <button 
             onClick={() => setIsExpanded(!isExpanded)}
-            className="p-2 rounded-md hover:bg-zinc-800 text-zinc-400 transition-colors"
+            className="p-2 rounded-md hover:bg-white/10 text-zinc-400 transition-colors"
           >
             {isExpanded ? <PanelLeftClose size={20} /> : <PanelLeftOpen size={20} />}
           </button>
@@ -62,8 +65,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               to={item.path}
               className={`flex items-center gap-4 px-3 py-3 rounded-md transition-all ${
                 location.pathname === item.path 
-                ? 'bg-zinc-800 text-white' 
-                : 'text-zinc-400 hover:bg-zinc-900 hover:text-white'
+                ? 'bg-white/10 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]' 
+                : 'text-zinc-400 hover:bg-white/5 hover:text-white'
               }`}
             >
               <div className="shrink-0">{item.icon}</div>
@@ -73,9 +76,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </nav>
 
         {/* Bottom User Area */}
-        <div className="p-3 border-t border-zinc-900 space-y-2">
-          <div className={`flex items-center gap-3 px-3 py-3 rounded-md ${isExpanded ? 'bg-zinc-900/40' : 'justify-center'}`}>
-            <div className="w-8 h-8 rounded bg-emerald-600 flex items-center justify-center text-xs font-bold text-white shrink-0">
+        <div className="p-3 border-t border-white/5 space-y-2">
+          <div className={`flex items-center gap-3 px-3 py-3 rounded-md ${isExpanded ? 'bg-black/30 border border-white/5' : 'justify-center'}`}>
+            <div className="w-8 h-8 rounded bg-emerald-600/80 border border-emerald-500/50 flex items-center justify-center text-xs font-bold text-white shrink-0 shadow-lg">
               {user?.name?.charAt(0).toUpperCase() || 'U'}
             </div>
             {isExpanded && (
@@ -88,7 +91,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
           <button 
             onClick={handleLogout}
-            className={`w-full flex items-center gap-4 px-3 py-3 rounded-md text-zinc-400 hover:text-red-400 hover:bg-red-950/20 transition-all ${!isExpanded && 'justify-center'}`}
+            className={`w-full flex items-center gap-4 px-3 py-3 rounded-md text-zinc-400 hover:text-red-400 hover:bg-red-950/30 transition-all ${!isExpanded && 'justify-center'}`}
           >
             <LogOut size={20} />
             {isExpanded && <span className="text-sm font-medium">Logout</span>}
@@ -97,7 +100,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       </aside>
 
       {/* --- MAIN CONTENT AREA --- */}
-      <main className="flex-1 overflow-auto no-scrollbar bg-[#050505] p-6">
+      <main className="flex-1 overflow-auto no-scrollbar relative z-10 p-6">
         <div className="max-w-[1600px] mx-auto h-full">
           {children}
         </div>

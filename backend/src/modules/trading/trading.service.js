@@ -2,6 +2,7 @@ const walletService = require('../wallet/wallet.service');
 const publisher = require('./event.publisher');
 const { Order } = require('./order.model');
 const { v4: uuid } = require('uuid');
+const orderRepository = require('./order.repository');
 
 class TradingService {
   constructor(matchingEngine) {
@@ -29,12 +30,18 @@ class TradingService {
     }
 
     const trades = await this.matchingEngine.process(order);
-
+    console.log('Trades generated:', JSON.stringify(trades, null, 2)); // Add this
     for (const trade of trades) {
+      const buyerOrder = await orderRepository.get(trade.buyOrderId);
+      if (!buyerOrder) {
+        console.error(`CRITICAL: Order ${trade.buyOrderId} not found in database for trade.`);
+        continue;
+      }
       const { buyerWallet, sellerWallet } = await walletService.settleTrade({
         buyerId: trade.buyerId,
         sellerId: trade.sellerId,
         tradeValue: trade.price * trade.quantity,
+        lockedAmount: buyerOrder.lockedAmount,  
       });
 
       await publisher.publishTrade(trade);

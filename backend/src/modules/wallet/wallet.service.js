@@ -48,16 +48,30 @@ exports.releaseFunds = async (userId, amount) => {
   return await emitWalletUpdate(userId);
 };
 
-exports.settleTrade = async ({ buyerId, sellerId, tradeValue }) => {
-  const cents = toCents(tradeValue);
+exports.settleTrade = async ({ buyerId, sellerId, tradeValue, lockedAmount }) => {
+  const centsTradeValue = toCents(tradeValue);
+  const centsLocked = toCents(lockedAmount);
+  const refund = centsLocked - centsTradeValue;
 
-  await redisClient.hIncrBy(walletKey(buyerId), 'locked', -cents);
-  
-  await redisClient.hIncrBy(walletKey(sellerId), 'balance', cents);
+  // Start a transaction
+  const multi = redisClient.multi();
 
+  // 1. Update Buyer
+  multi.hIncrBy(walletKey(buyerId), 'locked', -centsLocked);
+  if (refund > 0) {
+    multi.hIncrBy(walletKey(buyerId), 'balance', refund);
+  }
+
+  // 2. Update Seller
+  multi.hIncrBy(walletKey(sellerId), 'balance', centsTradeValue);
+
+  // Execute all commands atomically
+  await multi.exec();
+
+  // Now fetch and emit the final, updated state
   const buyerWallet = await emitWalletUpdate(buyerId);
   const sellerWallet = await emitWalletUpdate(sellerId);
-  
+
   return { buyerWallet, sellerWallet };
 };
 

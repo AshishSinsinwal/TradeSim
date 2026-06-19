@@ -4,9 +4,6 @@
 
 TradeSim is a high-performance, full-stack trading simulation platform capable of handling real-time order matching, wallet management, and live market updates. Built to simulate the core architecture of a real exchange using a custom Matching Engine and Event-Driven Architecture.
 
-🚀 **Live Demo:** [https://trade-sim-ten.vercel.app/]
-
-
 ## ⚡ Key Features
 
 * **Real-Time Matching Engine:** Custom Node.js engine implementing **Price-Time Priority** matching logic.

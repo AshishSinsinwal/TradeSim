@@ -33,6 +33,7 @@ class Order {
     this.remaining = quantity;
     this.status = OrderStatus.OPEN;
     this.timestamp = timestamp;
+    this.lockedAmount = side === OrderSide.BUY && type === OrderType.LIMIT ? price * quantity : 0;
   }
 }
 
