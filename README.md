@@ -15,6 +15,20 @@ TradeSim is a high-performance, full-stack trading simulation platform capable o
 
 ---
 
+## 📸 Screenshots & Demo
+
+### 1. The Trading Dashboard
+*Real-time Order Book, Trade History, and Order Entry form.*
+
+![Trading Dashboard](./asstes/trading-dashboard.png)
+
+### 2. Wallet & Portfolio
+*Live wallet balance updates with atomic locking for active orders.*
+
+![Wallet Page](./asstes/wallet-page.png)
+
+---
+
 ## 🛠 Tech Stack
 
 * **Frontend:** React (Vite), TypeScript, Tailwind CSS, Socket.io Client
@@ -173,20 +187,6 @@ npm run dev
 | POST | `/api/orders` | Place a new LIMIT or MARKET order |
 | GET | `/api/orders/open` | Fetch active orders for the user |
 | GET | `/api/orders/trades` | Fetch recent market trades |
-
----
-
-## 📸 Screenshots & Demo
-
-### 1. The Trading Dashboard
-*Real-time Order Book, Trade History, and Order Entry form.*
-
-![Trading Dashboard](./asstes/trading-dashboard.png)
-
-### 2. Wallet & Portfolio
-*Live wallet balance updates with atomic locking for active orders.*
-
-![Wallet Page](./asstes/wallet-page.png)
 
 ---
 
